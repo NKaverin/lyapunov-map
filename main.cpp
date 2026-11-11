@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 int main() {
 	const int width = 512;
 	const int height = 512;
@@ -15,8 +18,14 @@ int main() {
 			pixels[i + 2] = 128;
 		}
 	}
-	int last = pixels[pixels.size() - 3];
-	std::cout << "last red" << last << "\n";
+
+	// The last argument is the stride
+	const int ok = stbi_write_png("gradient.png", width, height, 3, pixels.data(), width * 3);
+	if (ok == 0) {
+		std::cerr << "coud not write gradient.png\n";
+		return 1;
+	}
+	std::cout << "wrote gradient.png";
 
 	return 0;
 }
