@@ -75,6 +75,21 @@ int main() {
 			plot[i + 1] = 0;
 			plot[i + 2] = 0;
 		}
+		// Band alng the bottom, red = positive (chaos), blue = negative
+		const double exponent = logistic_exponent(r, 2000);
+		for (int py = plot_height - 16; py < plot_height; ++py) {
+			const int i = (py * plot_width + px) * 3;
+			if (exponent > 0.0) {
+				plot[i] = 200;
+				plot[i + 1] = 30;
+				plot[i + 2] = 30;
+			}
+			else {
+				plot[i] = 30;
+				plot[i + 1] = 60;
+				plot[i + 2] = 200;
+			}
+		}
 	}
 
 	if (stbi_write_png("bifurcation.png", plot_width, plot_height, 3, plot.data(), plot_width * 3) == 0) {
