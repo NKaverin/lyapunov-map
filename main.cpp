@@ -131,6 +131,15 @@ Dual operator*(Dual a, Dual b) {
 	return Dual(a.value * b.value, a.derivative * b.value + a.value * b.derivative);
 }
 
+struct Logistic {
+	double r;
+
+	template <typename T>
+	T step(T x, int) const {
+		return r * x * (1.0 - x);
+	}
+};
+
 int main() {
 	const int width = 512;
 	const int height = 512;
