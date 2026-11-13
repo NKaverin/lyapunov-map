@@ -151,6 +151,15 @@ struct Alternating {
 	}
 };
 
+struct Quadratic {
+	double a;
+
+	template <typename T>
+	T step(T x, int) const {
+		return 1.0 - a * x * x;
+	}
+};
+
 template <typename System>
 double max_exponent(System system, int steps) {
 	double x = 0.3;
