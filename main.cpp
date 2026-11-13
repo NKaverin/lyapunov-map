@@ -140,6 +140,34 @@ struct Logistic {
 	}
 };
 
+struct Alternating {
+	double a;
+	double b;
+
+	template <typename T>
+	T step(T x, int n) const {
+		const double r = (n % 2 == 0) ? a : b;
+		return r * x * (1.0 - x);
+	}
+};
+
+template <typename System>
+double max_exponent(System system, int steps) {
+	double x = 0.3;
+
+	for (int n = 0; n < 1000; ++n) {
+		x = system.step(x, n);
+	}
+
+	double sum = 0.0;
+	for (int n = 0; n < steps; ++n) {
+		const Dual y = system.step(Dual(x, 1.0), n);
+		sum += std::log(std::abs(y.derivative));
+		x = y.value;
+	}
+	return sum / steps;
+}
+
 int main() {
 	const int width = 512;
 	const int height = 512;
