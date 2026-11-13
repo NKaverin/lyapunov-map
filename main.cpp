@@ -189,12 +189,20 @@ int main() {
 
 	std::cout << "wrote bifurcation.png\n";
 	
-	// lyapunov
+	// Lyapunov
 	const Grid full{ 2.0, 4.0, 2.0, 4.0, 512, 512 };
 	if (!write_map(full, "lyapunov.png", 1000)) {
 		std::cerr << "could not write lyapunov.png\n";
 		return 1;
 	}
 	std::cout << "wrote lyapunov.png\n";
+	// Zooming 
+	const Grid zoom{ 3.81, 3.87, 3.81, 3.87, 512, 512 };
+	if (!write_map(zoom, "zoom.png", 2000)) {
+		std::cerr << "could not write zoom.png\n";
+		return 1;
+	}
+	std::cout << "wrote zoom.png\n";
+
 	return 0;
 }
