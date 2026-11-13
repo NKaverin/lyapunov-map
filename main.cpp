@@ -24,6 +24,55 @@ double logistic_exponent(double r, int steps) {
 	return sum / steps;
 }
 
+double alternating_exponent(double a, double b, int steps) {
+	double x = 0.3;
+
+	for (int n = 0; n < 200; ++n) {
+		const double r = (n % 2 == 0) ? a : b;
+		x = r * x * (1.0 - x);
+	}
+	
+	double sum = 0.0;
+	for (int n = 0; n < steps; ++n) {
+		const double r = (n % 2 == 0) ? a : b;
+		sum += std::log(std::abs(r * (1.0 - 2.0 * x)));
+		x = r * x * (1.0 - x);
+	}
+	return sum / steps;
+}
+
+struct Rgb {
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
+};
+
+// Dark red = chaos, dark blue = strongly stable
+Rgb exponent_colour(double exponent) {
+	if (exponent > 0.0) {
+		// ln2	
+		double t = exponent / 0.7;
+		if (t > 1.0) {
+			t = 1.0;
+		}
+		return Rgb{
+			static_cast<unsigned char>(255 - 115 * t),
+			static_cast<unsigned char>(255 - 225 * t),
+			static_cast<unsigned char>(255 - 225 * t)
+		};
+	}
+	double t = -exponent / 2.0;
+	if (t > 1.0) {
+		t = 1.0;
+	}
+	return Rgb{
+		static_cast<unsigned char>(255 - 235 * t),
+		static_cast<unsigned char>(255 - 200 * t),
+		static_cast<unsigned char>(255 - 115 * t)
+	};
+}
+
+
 int main() {
 	const int width = 512;
 	const int height = 512;
@@ -48,8 +97,17 @@ int main() {
 	std::cout << "r = 4   " << logistic_exponent(4.0, 1000000) << "\n";
 	std::cout << "ln 2    " << std::log(2.0) << "\n";
 	// ln(0.5)
-	std::cout << "r = 2.5 " << logistic_exponent(4.0, 1000000) << "\n";
+	std::cout << "r = 2.5 " << logistic_exponent(2.5, 1000000) << "\n";
+	// Alternating
+	std::cout << "a = b = 4   " << alternating_exponent(4.0, 4.0, 1000000) << "\n";
+	std::cout << "a = b = 2.5 " << alternating_exponent(2.5, 2.5, 1000000) << "\n";
 
+	const Rgb chaos = exponent_colour(0.7);
+	const Rgb stable = exponent_colour(-36.0);
+	int chaos_green = chaos.g;
+	int stable_blue = stable.b;
+	std::cout << "green " << chaos_green << "\n";
+	std::cout << "blue " << stable_blue << "\n";
 	// Bifurcation diagram
 	const int plot_width = 1024;
 	const int plot_height = 512;
