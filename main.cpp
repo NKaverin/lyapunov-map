@@ -47,6 +47,25 @@ struct Rgb {
 	unsigned char b;
 };
 
+// A rectangle
+struct Grid {
+	double a_min;
+	double a_max;
+	double b_min;
+	double b_max;
+	int width;
+	int height;
+
+	double a_at(int px) const {
+		return a_min + (a_max - a_min) * px / (width - 1);
+	}
+
+	// Row 0 is the top of the image
+	double b_at(int py) const {
+		return b_max - (b_max - b_min) * py / (height - 1);
+	}
+};
+
 // Dark red = chaos, dark blue = strongly stable
 Rgb exponent_colour(double exponent) {
 	if (exponent > 0.0) {
@@ -70,6 +89,25 @@ Rgb exponent_colour(double exponent) {
 		static_cast<unsigned char>(255 - 200 * t),
 		static_cast<unsigned char>(255 - 115 * t)
 	};
+}
+
+// Colours pixels of the grid, and writes a PNG, returns false otherwise
+bool write_map(Grid grid, const char* filename, int steps) {
+	std::vector<unsigned char> image(grid.width * grid.height * 3);
+
+	for (int py = 0; py < grid.height; ++py) {
+		const double b = grid.b_at(py);
+		for (int px = 0; px < grid.width; ++px) {
+			const double a = grid.a_at(px);
+			const Rgb colour = exponent_colour(alternating_exponent(a, b, steps));
+			const int i = (py * grid.width + px) * 3;
+			image[i] = colour.r;
+			image[i + 1] = colour.g;
+			image[i + 2] = colour.b;
+		}
+	}
+
+	return stbi_write_png(filename, grid.width, grid.height, 3, image.data(), grid.width * 3) != 0;
 }
 
 
@@ -102,12 +140,6 @@ int main() {
 	std::cout << "a = b = 4   " << alternating_exponent(4.0, 4.0, 1000000) << "\n";
 	std::cout << "a = b = 2.5 " << alternating_exponent(2.5, 2.5, 1000000) << "\n";
 
-	const Rgb chaos = exponent_colour(0.7);
-	const Rgb stable = exponent_colour(-36.0);
-	int chaos_green = chaos.g;
-	int stable_blue = stable.b;
-	std::cout << "green " << chaos_green << "\n";
-	std::cout << "blue " << stable_blue << "\n";
 	// Bifurcation diagram
 	const int plot_width = 1024;
 	const int plot_height = 512;
@@ -156,6 +188,13 @@ int main() {
 	}
 
 	std::cout << "wrote bifurcation.png\n";
-
+	
+	// lyapunov
+	const Grid full{ 2.0, 4.0, 2.0, 4.0, 512, 512 };
+	if (!write_map(full, "lyapunov.png", 1000)) {
+		std::cerr << "could not write lyapunov.png\n";
+		return 1;
+	}
+	std::cout << "wrote lyapunov.png\n";
 	return 0;
 }
