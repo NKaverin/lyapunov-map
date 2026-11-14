@@ -198,7 +198,7 @@ struct Henon {
 // A direction (vx, vy) along with the poing, the log is recorded and the direction is scaled to 1
 template <typename System>
 double plane_exponent(System system, int steps) {
-	Vec2<double> p{ 0.0, 0.0 };
+	Vec2<double> p{ 0.1, 0.0 };
 
 	for (int n = 0; n < 1000; ++n) {
 		p = system.step(p, n);
