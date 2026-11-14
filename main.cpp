@@ -161,7 +161,7 @@ struct Quadratic {
 };
 
 template <typename System>
-double max_exponent(System system, int steps) {
+double map_exponent(System system, int steps) {
 	double x = 0.3;
 
 	for (int n = 0; n < 1000; ++n) {
@@ -205,6 +205,16 @@ int main() {
 	// Alternating
 	std::cout << "a = b = 4   " << alternating_exponent(4.0, 4.0, 1000000) << "\n";
 	std::cout << "a = b = 2.5 " << alternating_exponent(2.5, 2.5, 1000000) << "\n";
+
+	// Dual
+	const Dual x(0.3, 1.0);
+	const Dual y = 4.0 * x * (1.0 - x);
+	std::cout << "dual       " << y.value << " " << y.derivative << "\n";
+	std::cout << "by hand    " << 4.0 * 0.3 * (1.0 - 0.3) << " " << 4.0 * (1.0 - 2.0 * 0.3) << "\n";
+	std::cout << "Logistic 4   " << map_exponent(Logistic{ 4.0 }, 1000000) << "\n";
+	std::cout << "Alternating  " << map_exponent(Alternating{ 2.5, 3.5 }, 1000000) << "\n";
+	std::cout << "by hand      " << alternating_exponent(2.5, 3.5, 1000000) << "\n";
+	std::cout << "Quadratic 2  " << map_exponent(Quadratic{ 2.0 }, 1000000) << "\n";
 
 	// Bifurcation diagram
 	const int plot_width = 1024;
