@@ -327,5 +327,28 @@ int main() {
 	}
 	std::cout << "wrote zoom.png\n";
 
+	// The henon attractor
+	const int attractor_width = 768;
+	const int attractor_height = 512;
+	std::vector<unsigned char> attractor(attractor_width* attractor_height * 3, 255);
+	const Henon henon{ 1.4, 0.3 };
+	Vec2<double> point{ 0.1, 0.0 };
+
+	for (int n = 0; n < 2000000; ++n) {
+		point = henon.step(point, n);
+		const int px = static_cast<int>((point.x + 1.5) / 3.0 * (attractor_width - 1));
+		const int py = static_cast<int>((0.45 - point.y) / 0.9 * (attractor_height - 1));
+		const int i = (py * attractor_width + px) * 3;
+		attractor[i] = 0;
+		attractor[i + 1] = 0;
+		attractor[i + 2] = 0;
+	}
+
+	if (stbi_write_png("henon.png", attractor_width, attractor_height, 3, attractor.data(), attractor_width * 3) == 0) {
+		std::cerr << "could not write henon.png\n";
+		return 1;
+	}
+
+	std::cout << "wrote henon.png\n";
 	return 0;
 }
