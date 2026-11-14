@@ -177,6 +177,49 @@ double map_exponent(System system, int steps) {
 	return sum / steps;
 }
 
+// A double or dual
+template <typename T> 
+struct Vec2 {
+	T x;
+	T y;
+};
+
+// The Henon map (x, y) -> (1 - a x^2 + y, b x)
+struct Henon {
+	double a;
+	double b;
+
+	template <typename T>
+	Vec2<T> step(Vec2<T> p, int) const {
+		return Vec2<T>{ 1.0 - a * p.x * p.x + p.y, b* p.x };
+	}
+};
+
+// A direction (vx, vy) along with the poing, the log is recorded and the direction is scaled to 1
+template <typename System>
+double plane_exponent(System system, int steps) {
+	Vec2<double> p{ 0.0, 0.0 };
+
+	for (int n = 0; n < 1000; ++n) {
+		p = system.step(p, n);
+	}
+
+	double vx = 1.0;
+	double vy = 0.0;
+	double sum = 0.0;
+	for (int n = 0; n < steps; ++n) {
+		const Vec2<Dual> q = system.step(Vec2<Dual>{ Dual(p.x, vx), Dual(p.y, vy) }, n);
+		const double dx = q.x.derivative;
+		const double dy = q.y.derivative;
+		const double stretch = std::sqrt(dx * dx + dy * dy);
+		sum += std::log(stretch);
+		vx = dx / stretch;
+		vy = dy / stretch;
+		p = Vec2<double>{ q.x.value, q.y.value };
+	}
+	return sum / steps;
+}
+
 int main() {
 	const int width = 512;
 	const int height = 512;
@@ -215,6 +258,10 @@ int main() {
 	std::cout << "Alternating  " << map_exponent(Alternating{ 2.5, 3.5 }, 1000000) << "\n";
 	std::cout << "by hand      " << alternating_exponent(2.5, 3.5, 1000000) << "\n";
 	std::cout << "Quadratic 2  " << map_exponent(Quadratic{ 2.0 }, 1000000) << "\n";
+
+	// Henon
+	std::cout << "Henon 1.4 0.3 " << plane_exponent(Henon{ 1.4, 0.3 }, 1000000) << "\n";
+	std::cout << "Henon 2 0     " << plane_exponent(Henon{ 2.0, 0.0 }, 1000000) << "\n";
 
 	// Bifurcation diagram
 	const int plot_width = 1024;
