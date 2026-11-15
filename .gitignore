@@ -2,4 +2,5 @@ build/
 *.png
 .vs/
 out/
+*.log
 
