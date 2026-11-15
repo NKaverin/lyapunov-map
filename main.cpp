@@ -5,6 +5,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 #include "dual.hpp"
+#include "systems.hpp"
 
 // Largest Lyapunov exponent of the map x -> r x (1 - x):
 // the average of log|f'(x)| along one orbit, with f'(x) = r ( 1 - 2x)
@@ -111,35 +112,6 @@ bool write_map(Grid grid, const char* filename, int steps) {
 	return stbi_write_png(filename, grid.width, grid.height, 3, image.data(), grid.width * 3) != 0;
 }
 
-struct Logistic {
-	double r;
-
-	template <typename T>
-	T step(T x, int) const {
-		return r * x * (1.0 - x);
-	}
-};
-
-struct Alternating {
-	double a;
-	double b;
-
-	template <typename T>
-	T step(T x, int n) const {
-		const double r = (n % 2 == 0) ? a : b;
-		return r * x * (1.0 - x);
-	}
-};
-
-struct Quadratic {
-	double a;
-
-	template <typename T>
-	T step(T x, int) const {
-		return 1.0 - a * x * x;
-	}
-};
-
 template <typename System>
 double map_exponent(System system, int steps) {
 	double x = 0.3;
@@ -156,24 +128,6 @@ double map_exponent(System system, int steps) {
 	}
 	return sum / steps;
 }
-
-// A double or dual
-template <typename T> 
-struct Vec2 {
-	T x;
-	T y;
-};
-
-// The Henon map (x, y) -> (1 - a x^2 + y, b x)
-struct Henon {
-	double a;
-	double b;
-
-	template <typename T>
-	Vec2<T> step(Vec2<T> p, int) const {
-		return Vec2<T>{ 1.0 - a * p.x * p.x + p.y, b* p.x };
-	}
-};
 
 // A direction (vx, vy) along with the poing, the log is recorded and the direction is scaled to 1
 template <typename System>
