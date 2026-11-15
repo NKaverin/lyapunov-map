@@ -8,8 +8,8 @@
 #include "image.hpp"
 #include "systems.hpp"
 
-
-int main() {
+// Test image
+bool write_gradient() {
 	const int width = 512;
 	const int height = 512;
 
@@ -27,9 +27,15 @@ int main() {
 	// The last argument is the stride
 	if (stbi_write_png("gradient.png", width, height, 3, pixels.data(), width * 3) == 0) {
 		std::cerr << "coud not write gradient.png\n";
-		return 1;
+		return false;
 	}
+
 	std::cout << "wrote gradient.png\n";
+	return true;
+}
+
+// Exponent with known values
+void run_checks() {
 	std::cout << "r = 4   " << logistic_exponent(4.0, 1000000) << "\n";
 	std::cout << "ln 2    " << std::log(2.0) << "\n";
 	// ln(0.5)
@@ -51,7 +57,10 @@ int main() {
 	// Henon
 	std::cout << "Henon 1.4 0.3 " << plane_exponent(Henon{ 1.4, 0.3 }, 1000000) << "\n";
 	std::cout << "Henon 2 0     " << plane_exponent(Henon{ 2.0, 0.0 }, 1000000) << "\n";
+}
 
+// Bifurcation diagram
+bool write_bifurcation() {
 	// Bifurcation diagram
 	const int plot_width = 1024;
 	const int plot_height = 512;
@@ -96,27 +105,36 @@ int main() {
 
 	if (stbi_write_png("bifurcation.png", plot_width, plot_height, 3, plot.data(), plot_width * 3) == 0) {
 		std::cerr << "could not write bifurcation.png\n";
-		return 1;
+		return false;
 	}
 
 	std::cout << "wrote bifurcation.png\n";
-	
-	// Lyapunov
+	return true;
+}
+
+// Exponent of the alternating logistic map
+bool write_maps() {
 	const Grid full{ 2.0, 4.0, 2.0, 4.0, 512, 512 };
 	if (!write_map(full, "lyapunov.png", 1000)) {
 		std::cerr << "could not write lyapunov.png\n";
-		return 1;
+		return false;
 	}
+	
 	std::cout << "wrote lyapunov.png\n";
+	
 	// Zooming 
 	const Grid zoom{ 3.81, 3.87, 3.81, 3.87, 512, 512 };
 	if (!write_map(zoom, "zoom.png", 2000)) {
 		std::cerr << "could not write zoom.png\n";
-		return 1;
+		return false;
 	}
-	std::cout << "wrote zoom.png\n";
 
-	// The henon attractor
+	std::cout << "wrote zoom.png\n";
+	return true;
+}
+
+// Henon attractor, one orbit
+bool write_henon() {
 	const int attractor_width = 768;
 	const int attractor_height = 512;
 	std::vector<unsigned char> attractor(attractor_width* attractor_height * 3, 255);
@@ -139,5 +157,16 @@ int main() {
 	}
 
 	std::cout << "wrote henon.png\n";
+
+}
+
+int main() {
+	if (!write_gradient()) {
+		return 1;
+	}
+	run_checks();
+	if (!write_bifurcation() || !write_maps() || !write_henon()) {
+		return 1;
+	}
 	return 0;
 }
