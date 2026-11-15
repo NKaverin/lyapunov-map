@@ -153,11 +153,11 @@ bool write_henon() {
 
 	if (stbi_write_png("henon.png", attractor_width, attractor_height, 3, attractor.data(), attractor_width * 3) == 0) {
 		std::cerr << "could not write henon.png\n";
-		return 1;
+		return false;
 	}
 
 	std::cout << "wrote henon.png\n";
-
+	return true;
 }
 
 int main() {
