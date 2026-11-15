@@ -4,6 +4,7 @@
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
+#include "dual.hpp"
 
 // Largest Lyapunov exponent of the map x -> r x (1 - x):
 // the average of log|f'(x)| along one orbit, with f'(x) = r ( 1 - 2x)
@@ -108,27 +109,6 @@ bool write_map(Grid grid, const char* filename, int steps) {
 	}
 
 	return stbi_write_png(filename, grid.width, grid.height, 3, image.data(), grid.width * 3) != 0;
-}
-
-struct Dual {
-	double value;
-	double derivative;
-
-	// Derivative of a constant 0
-	Dual(double v, double d = 0.0) : value(v), derivative(d) {}
-};
-
-Dual operator+(Dual a, Dual b) {
-	return Dual(a.value + b.value, a.derivative + b.derivative);
-}
-
-Dual operator-(Dual a, Dual b) {
-	return Dual(a.value - b.value, a.derivative - b.derivative);
-}
-
-// (ab)' = a'b + ab'
-Dual operator*(Dual a, Dual b) {
-	return Dual(a.value * b.value, a.derivative * b.value + a.value * b.derivative);
 }
 
 struct Logistic {
