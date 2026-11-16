@@ -65,7 +65,7 @@ inline bool write_map(Grid grid, const char* filename, int steps, Exponent expon
 	std::vector<unsigned char> image(grid.width * grid.height * 3);
 
 	// Rows are independent
-	#pragma omp parallel for
+	#pragma omp parallel for schedule(dynamic)
 	for (int py = 0; py < grid.height; ++py) {
 		const double b = grid.b_at(py);
 		for (int px = 0; px < grid.width; ++px) {

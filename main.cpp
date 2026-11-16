@@ -1,6 +1,7 @@
 #include <chrono>
 #include <cmath>
 #include <iostream>
+#include <omp.h>
 #include <vector>
 
 #include "dual.hpp"
@@ -210,6 +211,7 @@ bool write_henon_map() {
 }
 
 int main() {
+	std::cout << "threads " << omp_get_max_threads() << "\n";
 	if (!write_gradient()) {
 		return 1;
 	}
