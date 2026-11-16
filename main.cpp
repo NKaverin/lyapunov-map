@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cmath>
 #include <iostream>
 #include <vector>
@@ -7,6 +8,16 @@
 #include "reference.hpp"
 #include "image.hpp"
 #include "systems.hpp"
+
+auto seconds_start() {
+	const auto start = std::chrono::steady_clock::now();
+	return start;
+}
+
+double seconds_since(std::chrono::steady_clock::time_point start) {
+	const std::chrono::duration<double> elapsed = std::chrono::steady_clock::now() - start;
+	return elapsed.count();
+}
 
 // Test image
 bool write_gradient() {
@@ -122,22 +133,24 @@ bool write_bifurcation() {
 
 // Exponent of the alternating logistic map
 bool write_maps() {
+	const auto full_start = seconds_start();
 	const Grid full{ 2.0, 4.0, 2.0, 4.0, 512, 512 };
 	if (!write_map(full, "lyapunov.png", 1000, alternating_exponent)) {
 		std::cerr << "could not write lyapunov.png\n";
 		return false;
 	}
 	
-	std::cout << "wrote lyapunov.png\n";
+	std::cout << "wrote lyapunov.png " << seconds_since(full_start) << "s\n";
 	
 	// Zooming 
+	const auto zoom_start = seconds_start();
 	const Grid zoom{ 3.81, 3.87, 3.81, 3.87, 512, 512 };
 	if (!write_map(zoom, "zoom.png", 2000, alternating_exponent)) {
 		std::cerr << "could not write zoom.png\n";
 		return false;
 	}
 
-	std::cout << "wrote zoom.png\n";
+	std::cout << "wrote zoom.png " << seconds_since(zoom_start) << "s\n";
 	return true;
 }
 
@@ -176,21 +189,23 @@ double henon_exponent(double a, double b, int steps) {
 
 // Exponent of the Henon map. Grey ones = escaped
 bool write_henon_map() {
+	const auto plane_start = seconds_start();
 	const Grid plane{ 0.0, 2.0, -0.5, 0.5, 768, 384 };
 	if (!write_map(plane, "henon_map.png", 1000, henon_exponent)) {
 		std::cerr << "could not write henon_map.png\n";
 		return false;
 	}
 
-	std::cout << "wrote_henon_map.png\n";
+	std::cout << "wrote_henon_map.png " << seconds_since(plane_start) << "s\n";
 	
 	// One shrimp, enlarged
+	const auto shrimp_start = seconds_start();
 	const Grid shrimp{ 1.4, 1.6, 0.1, 0.3, 384, 384 };
 	if (!write_map(shrimp, "henon_zoom.png", 1000, henon_exponent)) {
 		std::cerr << "could not write henon_zoom.png\n";
 		return false;
 	}
-	std::cout << "wrote henon_zoom.png\n";
+	std::cout << "wrote henon_zoom.png " << seconds_since(shrimp_start) << "s\n";
 	return true;
 }
 
