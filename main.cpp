@@ -59,6 +59,12 @@ void run_checks() {
 	std::cout << "Henon 2 0     " << plane_exponent(Henon{ 2.0, 0.0 }, 1000000) << "\n";
 	// The output should be NaN
 	std::cout << "Henon 2 0.3   " << plane_exponent(Henon{ 2.0, 0.3 }, 1000000) << "\n";
+	// Exponents
+	const Spectrum both = plane_spectrum(Henon{ 1.4, 0.3 }, 1000000);
+	std::cout << "spectrum  " << both.first << " " << both.second << "\n";
+	std::cout << "sum       " << both.first + both.second << "\n";
+	std::cout << "ln 0.3    " << std::log(0.3) << "\n";
+	std::cout << "dimension " << 1.0 - both.first / both.second << "\n";
 }
 
 // Bifurcation diagram
