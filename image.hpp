@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <vector>
 
 #include "stb_image_write.h"
@@ -32,6 +33,9 @@ struct Grid {
 
 // Dark red = chaos, dark blue = strongly stable
 inline Rgb exponent_colour(double exponent) {
+	if (std::isnan(exponent)) {
+		return Rgb{ 128, 128, 128 };
+	}
 	if (exponent > 0.0) {
 		// ln2	
 		double t = exponent / 0.7;

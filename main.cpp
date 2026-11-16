@@ -162,12 +162,32 @@ bool write_henon() {
 	return true;
 }
 
+// Largest exponent of the Henon map at one pixel
+double henon_exponent(double a, double b, int steps) {
+	return plane_exponent(Henon{ a, b }, steps);
+}
+
+// Exponent of the Henon map. Grey ones = escaped
+bool write_henon_map() {
+	const Grid plane{ 0.0, 2.0, -0.5, 0.5, 768, 384 };
+	if (!write_map(plane, "henon_map.png", 1000, henon_exponent)) {
+		std::cerr << "could not write henon_map.png\n";
+		return false;
+	}
+
+	std::cout << "wrote_henon_map.png\n";
+	return true;
+}
+
 int main() {
 	if (!write_gradient()) {
 		return 1;
 	}
 	run_checks();
-	if (!write_bifurcation() || !write_maps() || !write_henon()) {
+	if (!write_bifurcation() || 
+		!write_maps() || 
+		!write_henon() || 
+		!write_henon_map()) {
 		return 1;
 	}
 	return 0;
