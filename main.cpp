@@ -226,6 +226,32 @@ bool write_henon_map() {
 	return true;
 }
 
+bool write_lorenz() {
+	const int width = 768;
+	const int height = 512;
+	std::vector<unsigned char> image(width * height * 3, 255);
+	const Lorenz lorenz{ 10.0, 28.0, 8.0 / 3.0 };
+	Vec3<double> s{ 1.0, 1.0, 1.0 };
+
+	for (int n = 0; n < 200000; ++n) {
+		s = rk4_step(lorenz, s, 0.005);
+		const int px = static_cast<int>((s.x + 25.0) / 50.0 * (width - 1));
+		const int py = static_cast<int>((55.0 - s.z) / 55.0 * (height - 1));
+		const int i = (py * width + px) * 3;
+		image[i] = 0;
+		image[i + 1] = 0;
+		image[i + 2] = 0;
+	}
+
+	if (stbi_write_png("lorenz.png", width, height, 3, image.data(), width * 3) == 0) {
+		std::cerr << "could not write lorenz.png\n";
+		return false;
+	}
+
+	std::cout << "wrote lorenz.png\n";
+	return true;
+}
+
 int main() {
 	std::cout << "threads " << omp_get_max_threads() << "\n";
 	if (!write_gradient()) {
@@ -235,7 +261,8 @@ int main() {
 	if (!write_bifurcation() || 
 		!write_maps() || 
 		!write_henon() || 
-		!write_henon_map()) {
+		!write_henon_map() ||
+		!write_lorenz()) {
 		return 1;
 	}
 	return 0;
