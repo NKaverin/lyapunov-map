@@ -48,15 +48,17 @@ bool write_gradient() {
 
 // Exponent with known values
 void run_checks() {
+	// Logistic
 	std::cout << "r = 4   " << logistic_exponent(4.0, 1000000) << "\n";
 	std::cout << "ln 2    " << std::log(2.0) << "\n";
 	// ln(0.5)
 	std::cout << "r = 2.5 " << logistic_exponent(2.5, 1000000) << "\n";
+	
 	// Alternating
 	std::cout << "a = b = 4   " << alternating_exponent(4.0, 4.0, 1000000) << "\n";
 	std::cout << "a = b = 2.5 " << alternating_exponent(2.5, 2.5, 1000000) << "\n";
 
-	// Dual
+	// Dual numbers
 	const Dual x(0.3, 1.0);
 	const Dual y = 4.0 * x * (1.0 - x);
 	std::cout << "dual       " << y.value << " " << y.derivative << "\n";
@@ -69,14 +71,21 @@ void run_checks() {
 	// Henon
 	std::cout << "Henon 1.4 0.3 " << plane_exponent(Henon{ 1.4, 0.3 }, 1000000) << "\n";
 	std::cout << "Henon 2 0     " << plane_exponent(Henon{ 2.0, 0.0 }, 1000000) << "\n";
+	
 	// The output should be NaN
 	std::cout << "Henon 2 0.3   " << plane_exponent(Henon{ 2.0, 0.3 }, 1000000) << "\n";
+	
 	// Exponents
 	const Spectrum both = plane_spectrum(Henon{ 1.4, 0.3 }, 1000000);
 	std::cout << "spectrum  " << both.first << " " << both.second << "\n";
 	std::cout << "sum       " << both.first + both.second << "\n";
 	std::cout << "ln 0.3    " << std::log(0.3) << "\n";
 	std::cout << "dimension " << 1.0 - both.first / both.second << "\n";
+	
+	// Lorenz
+	const Lorenz lorenz{ 10.0, 28.0, 8.0 / 3.0 };
+	const Vec3<double> rate = lorenz.rate(Vec3<double>{ 1.0, 1.0, 1.0 });
+	std::cout << "lorenz rate " << rate.x << " " << rate.y << " " << rate.z << "\n";
 }
 
 // Bifurcation diagram

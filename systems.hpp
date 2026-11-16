@@ -49,4 +49,37 @@ struct Henon {
 	}
 };
 
+template <typename T>
+struct Vec3 {
+	T x;
+	T y;
+	T z;
+};
+
+template <typename T>
+Vec3<T> operator+(Vec3<T> a, Vec3<T> b) {
+	return Vec3<T>{ a.x + b.x, a.y + b.y, a.z + b.z };
+}
+
+template <typename T>
+Vec3<T> operator*(double c, Vec3<T> v) {
+	return Vec3<T>{ c * v.x, c * v.y, c * v.z };
+}
+
+// The Lorenz equations
+struct Lorenz {
+	double sigma;
+	double rho;
+	double beta;
+
+	template <typename T>
+	Vec3<T> rate(Vec3<T> s) const {
+		return Vec3<T>{
+			sigma* (s.y - s.x),
+			s.x * (rho - s.z) - s.y,
+			s.x * s.y - beta * s.z
+		};
+	}
+};
+
 
