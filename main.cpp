@@ -57,6 +57,7 @@ void run_checks() {
 	// Henon
 	std::cout << "Henon 1.4 0.3 " << plane_exponent(Henon{ 1.4, 0.3 }, 1000000) << "\n";
 	std::cout << "Henon 2 0     " << plane_exponent(Henon{ 2.0, 0.0 }, 1000000) << "\n";
+	std::cout << "Henon 2 0.3   " << plane_exponent(Henon{ 2.0, 0.3 }, 1000000) << "\n";
 }
 
 // Bifurcation diagram

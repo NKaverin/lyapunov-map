@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <limits>
 
 #include "dual.hpp"
 #include "systems.hpp"
@@ -22,6 +23,9 @@ double map_exponent(System system, int steps) {
 	return sum / steps;
 }
 
+// An orbit whose x leaves this range is treated as gone to infinity
+const double escape_radius = 1.0e6;
+
 // A direction (vx, vy) along with the poing, the log is recorded and the direction is scaled to 1
 template <typename System>
 double plane_exponent(System system, int steps) {
@@ -29,6 +33,9 @@ double plane_exponent(System system, int steps) {
 
 	for (int n = 0; n < 1000; ++n) {
 		p = system.step(p, n);
+		if (!(std::abs(p.x) < escape_radius)) {
+			return std::numeric_limits<double>::quiet_NaN();
+		}
 	}
 
 	double vx = 1.0;
@@ -43,6 +50,9 @@ double plane_exponent(System system, int steps) {
 		vx = dx / stretch;
 		vy = dy / stretch;
 		p = Vec2<double>{ q.x.value, q.y.value };
+		if (!(std::abs(p.x) < escape_radius)) {
+			return std::numeric_limits<double>::quiet_NaN();
+		}
 	}
 	return sum / steps;
 }
