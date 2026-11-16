@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "dual.hpp"
+#include "flow.hpp"
 #include "exponent.hpp"
 #include "reference.hpp"
 #include "image.hpp"
@@ -86,6 +87,12 @@ void run_checks() {
 	const Lorenz lorenz{ 10.0, 28.0, 8.0 / 3.0 };
 	const Vec3<double> rate = lorenz.rate(Vec3<double>{ 1.0, 1.0, 1.0 });
 	std::cout << "lorenz rate " << rate.x << " " << rate.y << " " << rate.z << "\n";
+	const Vec3<double> start{ 1.0, 1.0, 1.0 };
+	const double coarse = flow(lorenz, start, 0.5, 0.02).x;
+	const double medium = flow(lorenz, start, 0.5, 0.01).x;
+	const double fine = flow(lorenz, start, 0.5, 0.005).x;
+	std::cout << "x(0.5)      " << fine << "\n";
+	std::cout << "error ratio " << (coarse - medium) / (medium - fine) << "\n";
 }
 
 // Bifurcation diagram
