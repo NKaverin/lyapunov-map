@@ -4,7 +4,6 @@
 
 #include "stb_image_write.h"
 
-#include "reference.hpp"
 
 struct Rgb {
 	unsigned char r;
@@ -57,14 +56,15 @@ inline Rgb exponent_colour(double exponent) {
 }
 
 // Colours pixels of the grid, and writes a PNG, returns false otherwise
-inline bool write_map(Grid grid, const char* filename, int steps) {
+template <typename Exponent>
+inline bool write_map(Grid grid, const char* filename, int steps, Exponent exponent) {
 	std::vector<unsigned char> image(grid.width * grid.height * 3);
 
 	for (int py = 0; py < grid.height; ++py) {
 		const double b = grid.b_at(py);
 		for (int px = 0; px < grid.width; ++px) {
 			const double a = grid.a_at(px);
-			const Rgb colour = exponent_colour(alternating_exponent(a, b, steps));
+			const Rgb colour = exponent_colour(exponent(a, b, steps));
 			const int i = (py * grid.width + px) * 3;
 			image[i] = colour.r;
 			image[i + 1] = colour.g;

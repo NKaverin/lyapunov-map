@@ -57,6 +57,7 @@ void run_checks() {
 	// Henon
 	std::cout << "Henon 1.4 0.3 " << plane_exponent(Henon{ 1.4, 0.3 }, 1000000) << "\n";
 	std::cout << "Henon 2 0     " << plane_exponent(Henon{ 2.0, 0.0 }, 1000000) << "\n";
+	// The output should be NaN
 	std::cout << "Henon 2 0.3   " << plane_exponent(Henon{ 2.0, 0.3 }, 1000000) << "\n";
 }
 
@@ -116,7 +117,7 @@ bool write_bifurcation() {
 // Exponent of the alternating logistic map
 bool write_maps() {
 	const Grid full{ 2.0, 4.0, 2.0, 4.0, 512, 512 };
-	if (!write_map(full, "lyapunov.png", 1000)) {
+	if (!write_map(full, "lyapunov.png", 1000, alternating_exponent)) {
 		std::cerr << "could not write lyapunov.png\n";
 		return false;
 	}
@@ -125,7 +126,7 @@ bool write_maps() {
 	
 	// Zooming 
 	const Grid zoom{ 3.81, 3.87, 3.81, 3.87, 512, 512 };
-	if (!write_map(zoom, "zoom.png", 2000)) {
+	if (!write_map(zoom, "zoom.png", 2000, alternating_exponent)) {
 		std::cerr << "could not write zoom.png\n";
 		return false;
 	}
