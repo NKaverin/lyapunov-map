@@ -145,7 +145,7 @@ bool write_maps() {
 bool write_henon() {
 	const int attractor_width = 768;
 	const int attractor_height = 512;
-	std::vector<unsigned char> attractor(attractor_width* attractor_height * 3, 255);
+	std::vector<unsigned char> attractor(attractor_width * attractor_height * 3, 255);
 	const Henon henon{ 1.4, 0.3 };
 	Vec2<double> point{ 0.1, 0.0 };
 
@@ -165,6 +165,7 @@ bool write_henon() {
 	}
 
 	std::cout << "wrote henon.png\n";
+
 	return true;
 }
 
@@ -182,6 +183,14 @@ bool write_henon_map() {
 	}
 
 	std::cout << "wrote_henon_map.png\n";
+	
+	// One shrimp, enlarged
+	const Grid shrimp{ 1.4, 1.6, 0.1, 0.3, 384, 384 };
+	if (!write_map(shrimp, "henon_zoom.png", 1000, henon_exponent)) {
+		std::cerr << "could not write henon_zoom.png\n";
+		return false;
+	}
+	std::cout << "wrote henon_zoom.png\n";
 	return true;
 }
 
