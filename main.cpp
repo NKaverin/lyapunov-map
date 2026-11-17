@@ -93,6 +93,7 @@ void run_checks() {
 	const double fine = flow(lorenz, start, 0.5, 0.005).x;
 	std::cout << "x(0.5)      " << fine << "\n";
 	std::cout << "error ratio " << (coarse - medium) / (medium - fine) << "\n";
+	std::cout << "lorenz exponent " << flow_exponent(lorenz, 0.01, 1000000) << "\n";
 }
 
 // Bifurcation diagram
