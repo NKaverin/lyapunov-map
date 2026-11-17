@@ -99,6 +99,7 @@ void run_checks() {
 	std::cout << "lorenz spectrum " << all.first << " " << all.second << " " << all.third << "\n";
 	std::cout << "sum             " << all.first + all.second + all.third << "\n";
 	std::cout << "-(10 + 1 + 8/3) " << -(10.0 + 1.0 + 8.0 / 3.0) << "\n";
+	std::cout << "dimension       " << 2.0 - (all.first + all.second) / all.third << "\n";
 }
 
 // Bifurcation diagram
