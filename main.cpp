@@ -93,7 +93,12 @@ void run_checks() {
 	const double fine = flow(lorenz, start, 0.5, 0.005).x;
 	std::cout << "x(0.5)      " << fine << "\n";
 	std::cout << "error ratio " << (coarse - medium) / (medium - fine) << "\n";
+	// https://arxiv.org/pdf/1706.05882 0.9056
 	std::cout << "lorenz exponent " << flow_exponent(lorenz, 0.01, 1000000) << "\n";
+	const Spectrum3 all = flow_spectrum(lorenz, 0.01, 1000000);
+	std::cout << "lorenz spectrum " << all.first << " " << all.second << " " << all.third << "\n";
+	std::cout << "sum             " << all.first + all.second + all.third << "\n";
+	std::cout << "-(10 + 1 + 8/3) " << -(10.0 + 1.0 + 8.0 / 3.0) << "\n";
 }
 
 // Bifurcation diagram

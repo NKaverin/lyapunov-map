@@ -61,3 +61,48 @@ double flow_exponent(System system, double dt, int steps) {
 	}
 	return sum / (steps * dt);
 }
+
+// Largest first
+struct Spectrum3 {
+	double first;
+	double second;
+	double third;
+};
+
+template <typename System>
+Spectrum3 flow_spectrum(System system, double dt, int steps) {
+	Vec3<double> p{ 1.0, 1.0, 1.0 };
+	for (int n = 0; n < 10000; ++n) {
+		p = rk4_step(system, p, dt);
+	}
+
+	Vec3<double> u{ 1.0, 0.0, 0.0 };
+	Vec3<double> v{ 0.0, 1.0, 0.0 };
+	Vec3<double> w{ 0.0, 0.0, 1.0 };
+	double sum1 = 0.0;
+	double sum2 = 0.0;
+	double sum3 = 0.0;
+	for (int n = 0; n < steps; ++n) {
+		u = direction_of(rk4_step(system, with_direction(p, u), dt));
+		v = direction_of(rk4_step(system, with_direction(p, v), dt));
+		w = direction_of(rk4_step(system, with_direction(p, w), dt));
+		p = rk4_step(system, p, dt);
+
+		const double stretch1 = std::sqrt(dot(u, u));
+		u = (1.0 / stretch1) * u;
+
+		v = v + (-dot(v, u)) * u;
+		const double stretch2 = std::sqrt(dot(v, v));
+		v = (1.0 / stretch2) * v;
+
+		w = w + (-dot(w, u)) * u + (-dot(w, v)) * v;
+		const double stretch3 = std::sqrt(dot(w, w));
+		w = (1.0 / stretch3) * w;
+
+		sum1 += std::log(stretch1);
+		sum2 += std::log(stretch2);
+		sum3 += std::log(stretch3);
+	}
+	const double time = steps * dt;
+	return Spectrum3{ sum1 / time, sum2 / time, sum3 / time };
+}
