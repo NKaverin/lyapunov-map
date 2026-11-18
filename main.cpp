@@ -270,6 +270,25 @@ bool write_lorenz() {
 	return true;
 }
 
+double duffing_exponent(double gamma, double omega, int periods) {
+	const Duffing duffing{ 0.3, -1.0, 1.0, gamma, omega };
+	const double period = 2.0 * std::numbers::pi / omega;
+	const int per_period = 50;
+	return period * flow_exponent(duffing, period / per_period, period * per_period, 50 * per_period);
+}
+
+bool write_duffing_map() {
+	const auto start = seconds_start();
+	const Grid forcing{ 0.0, 0.8, 0.6, 1.8, 384, 256 };
+	if (!write_map(forcing, "duffing_map.png", 100, duffing_exponent)) {
+		std::cerr << "could not write duffing_map.png\n";
+		return false;
+	}
+
+	std::cout << "wrote duffing_map.png " << seconds_since(start) << "s\n";
+	return true;
+}
+
 int main() {
 	std::cout << "threads " << omp_get_max_threads() << "\n";
 	if (!write_gradient()) {
@@ -280,7 +299,8 @@ int main() {
 		!write_maps() || 
 		!write_henon() || 
 		!write_henon_map() ||
-		!write_lorenz()) {
+		!write_lorenz() ||
+		! write_duffing_map()) {
 		return 1;
 	}
 	return 0;

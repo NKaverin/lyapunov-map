@@ -43,9 +43,9 @@ inline Vec3<double> direction_of(Vec3<Dual> q) {
 
 // Largest Lyapunov exponent of a flow
 template <typename System>
-double flow_exponent(System system, double dt, int steps) {
+double flow_exponent(System system, double dt, int steps, int transient = 10000) {
 	Vec3<double> p{ 1.0, 1.0, 1.0 };
-	for (int n = 0; n < 10000; ++n) {
+	for (int n = 0; n < transient; ++n) {
 		p = rk4_step(system, p, dt);
 	}
 
