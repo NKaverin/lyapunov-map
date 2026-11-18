@@ -100,6 +100,10 @@ void run_checks() {
 	std::cout << "sum             " << all.first + all.second + all.third << "\n";
 	std::cout << "-(10 + 1 + 8/3) " << -(10.0 + 1.0 + 8.0 / 3.0) << "\n";
 	std::cout << "dimension       " << 2.0 - (all.first + all.second) / all.third << "\n";
+	// Cos check
+	const Dual c = cos(Dual(0.5, 1.0));
+	std::cout << "cos dual     " << c.value << " " << c.derivative << "\n";
+	std::cout << "by hand      " << std::cos(0.5) << " " << -std::sin(0.5) << "\n";
 }
 
 // Bifurcation diagram
