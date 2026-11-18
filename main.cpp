@@ -274,7 +274,7 @@ double duffing_exponent(double gamma, double omega, int periods) {
 	const Duffing duffing{ 0.3, -1.0, 1.0, gamma, omega };
 	const double period = 2.0 * std::numbers::pi / omega;
 	const int per_period = 50;
-	return period * flow_exponent(duffing, period / per_period, period * per_period, 50 * per_period);
+	return period * flow_exponent(duffing, period / per_period, periods * per_period, 50 * per_period);
 }
 
 bool write_duffing_map() {

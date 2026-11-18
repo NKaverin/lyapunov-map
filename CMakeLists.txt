@@ -23,3 +23,18 @@ if (MSVC)
 else()
 	target_compile_options(lyapmap PRIVATE -Wall -Wextra)
 endif()
+#Tests
+FetchContent_Declare(
+	Catch2
+	GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+	GIT_TAG 08092139210881f01a34e60c5f2fd6afa0ea4024 #v3.16.1
+)
+FetchContent_MakeAvailable(Catch2)
+
+add_executable(tests tests.cpp)
+target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+
+enable_testing()
+list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
+include(Catch)
+catch_discover_tests(tests)
