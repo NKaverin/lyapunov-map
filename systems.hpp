@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 // Each system has step(state, n), T is double or Dual
  
 struct Logistic {
@@ -82,4 +84,21 @@ struct Lorenz {
 	}
 };
 
+// Forced Duffing oscillator x'' _ delta x' + alpha x + beta x^3 = gamma cos(omega t)
+struct Duffing {
+	double delta;
+	double alpha;
+	double beta;
+	double gamma;
+	double omega;
 
+	template <typename T>
+	Vec3<T> rate(Vec3<T> s) const {
+		using std::cos;
+		return Vec3<T>{
+			s.y,
+			gamma* cos(s.z) - delta * s.y - alpha * s.x - beta * s.x * s.x * s.x,
+			T(omega)
+		};
+	}
+};

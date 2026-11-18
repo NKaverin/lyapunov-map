@@ -1,5 +1,6 @@
 #include <chrono>
 #include <cmath>
+#include <numbers>
 #include <iostream>
 #include <omp.h>
 #include <vector>
@@ -102,8 +103,14 @@ void run_checks() {
 	std::cout << "dimension       " << 2.0 - (all.first + all.second) / all.third << "\n";
 	// Cos check
 	const Dual c = cos(Dual(0.5, 1.0));
-	std::cout << "cos dual     " << c.value << " " << c.derivative << "\n";
-	std::cout << "by hand      " << std::cos(0.5) << " " << -std::sin(0.5) << "\n";
+	std::cout << "cos dual " << c.value << " " << c.derivative << "\n";
+	std::cout << "by hand  " << std::cos(0.5) << " " << -std::sin(0.5) << "\n";
+	// Duffing
+	const Duffing duffing{ 0.3, -1.0, 1.0, 0.5, 1.2 };
+	const double period = 2.0 * std::numbers::pi / duffing.omega;
+	const Spectrum3 forced = flow_spectrum(duffing, period / 100.0, 1000000);
+	std::cout << "duffing spectrum " << forced.first << " " << forced.second << " " << forced.third << "\n";
+	std::cout << "first + second   " << forced.first + forced.second << "\n";
 }
 
 // Bifurcation diagram
