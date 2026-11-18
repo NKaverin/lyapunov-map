@@ -14,6 +14,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(stb)
 
-target_include_directories(lyapmap PRIVATE ${stb_SOURCE_DIR})
+target_include_directories(lyapmap SYSTEM PRIVATE ${stb_SOURCE_DIR})
 find_package(OpenMP REQUIRED)
 target_link_libraries(lyapmap PRIVATE OpenMP::OpenMP_CXX)
+
+if (MSVC)
+	target_compile_options(lyapmap PRIVATE /W4)
+else()
+	target_compile_options(lyapmap PRIVATE -Wall -Wextra)
+endif()
