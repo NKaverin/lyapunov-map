@@ -48,71 +48,6 @@ bool write_gradient() {
 	return true;
 }
 
-// Exponent with known values
-void run_checks() {
-	// Logistic
-	std::cout << "r = 4   " << logistic_exponent(4.0, 1000000) << "\n";
-	std::cout << "ln 2    " << std::log(2.0) << "\n";
-	// ln(0.5)
-	std::cout << "r = 2.5 " << logistic_exponent(2.5, 1000000) << "\n";
-	
-	// Alternating
-	std::cout << "a = b = 4   " << alternating_exponent(4.0, 4.0, 1000000) << "\n";
-	std::cout << "a = b = 2.5 " << alternating_exponent(2.5, 2.5, 1000000) << "\n";
-
-	// Dual numbers
-	const Dual x(0.3, 1.0);
-	const Dual y = 4.0 * x * (1.0 - x);
-	std::cout << "dual       " << y.value << " " << y.derivative << "\n";
-	std::cout << "by hand    " << 4.0 * 0.3 * (1.0 - 0.3) << " " << 4.0 * (1.0 - 2.0 * 0.3) << "\n";
-	std::cout << "Logistic 4   " << map_exponent(Logistic{ 4.0 }, 1000000) << "\n";
-	std::cout << "Alternating  " << map_exponent(Alternating{ 2.5, 3.5 }, 1000000) << "\n";
-	std::cout << "by hand      " << alternating_exponent(2.5, 3.5, 1000000) << "\n";
-	std::cout << "Quadratic 2  " << map_exponent(Quadratic{ 2.0 }, 1000000) << "\n";
-
-	// Henon
-	std::cout << "Henon 1.4 0.3 " << plane_exponent(Henon{ 1.4, 0.3 }, 1000000) << "\n";
-	std::cout << "Henon 2 0     " << plane_exponent(Henon{ 2.0, 0.0 }, 1000000) << "\n";
-	
-	// The output should be NaN
-	std::cout << "Henon 2 0.3   " << plane_exponent(Henon{ 2.0, 0.3 }, 1000000) << "\n";
-	
-	// Exponents
-	const Spectrum both = plane_spectrum(Henon{ 1.4, 0.3 }, 1000000);
-	std::cout << "spectrum  " << both.first << " " << both.second << "\n";
-	std::cout << "sum       " << both.first + both.second << "\n";
-	std::cout << "ln 0.3    " << std::log(0.3) << "\n";
-	std::cout << "dimension " << 1.0 - both.first / both.second << "\n";
-	
-	// Lorenz
-	const Lorenz lorenz{ 10.0, 28.0, 8.0 / 3.0 };
-	const Vec3<double> rate = lorenz.rate(Vec3<double>{ 1.0, 1.0, 1.0 });
-	std::cout << "lorenz rate " << rate.x << " " << rate.y << " " << rate.z << "\n";
-	const Vec3<double> start{ 1.0, 1.0, 1.0 };
-	const double coarse = flow(lorenz, start, 0.5, 0.02).x;
-	const double medium = flow(lorenz, start, 0.5, 0.01).x;
-	const double fine = flow(lorenz, start, 0.5, 0.005).x;
-	std::cout << "x(0.5)      " << fine << "\n";
-	std::cout << "error ratio " << (coarse - medium) / (medium - fine) << "\n";
-	// https://arxiv.org/pdf/1706.05882 0.9056
-	std::cout << "lorenz exponent " << flow_exponent(lorenz, 0.01, 1000000) << "\n";
-	const Spectrum3 all = flow_spectrum(lorenz, 0.01, 1000000);
-	std::cout << "lorenz spectrum " << all.first << " " << all.second << " " << all.third << "\n";
-	std::cout << "sum             " << all.first + all.second + all.third << "\n";
-	std::cout << "-(10 + 1 + 8/3) " << -(10.0 + 1.0 + 8.0 / 3.0) << "\n";
-	std::cout << "dimension       " << 2.0 - (all.first + all.second) / all.third << "\n";
-	// Cos check
-	const Dual c = cos(Dual(0.5, 1.0));
-	std::cout << "cos dual " << c.value << " " << c.derivative << "\n";
-	std::cout << "by hand  " << std::cos(0.5) << " " << -std::sin(0.5) << "\n";
-	// Duffing
-	const Duffing duffing{ 0.3, -1.0, 1.0, 0.5, 1.2 };
-	const double period = 2.0 * std::numbers::pi / duffing.omega;
-	const Spectrum3 forced = flow_spectrum(duffing, period / 100.0, 1000000);
-	std::cout << "duffing spectrum " << forced.first << " " << forced.second << " " << forced.third << "\n";
-	std::cout << "first + second   " << forced.first + forced.second << "\n";
-}
-
 // Bifurcation diagram
 bool write_bifurcation() {
 	// Bifurcation diagram
@@ -294,7 +229,6 @@ int main() {
 	if (!write_gradient()) {
 		return 1;
 	}
-	run_checks();
 	if (!write_bifurcation() || 
 		!write_maps() || 
 		!write_henon() || 
