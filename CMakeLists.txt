@@ -38,3 +38,16 @@ enable_testing()
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(Catch)
 catch_discover_tests(tests)
+# GPU
+include(CheckLanguage)
+check_language(CUDA)
+if(CMAKE_CUDA_COMPILER)
+	enable_language(CUDA)
+	set(CMAKE_CUDA_STANDARD 20)
+	set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+
+	add_executable(lyapgpu gpu.cu)
+	# RTX 3050
+	set_target_properties(lyapgpu PROPERTIES CUDA_ARCHITECTURES 86)
+	target_include_directories(lyapgpu PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+endif()
