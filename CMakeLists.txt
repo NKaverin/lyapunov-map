@@ -46,7 +46,7 @@ if(CMAKE_CUDA_COMPILER)
 	set(CMAKE_CUDA_STANDARD 20)
 	set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
-	add_executable(lyapgpu gpu.cu)
+	add_executable(lyapgpu gpu.cu stb_image_write.cpp)
 	# RTX 3050
 	set_target_properties(lyapgpu PROPERTIES CUDA_ARCHITECTURES 86)
 	target_include_directories(lyapgpu PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})

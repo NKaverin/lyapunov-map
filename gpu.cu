@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
 #include <vector>
 
 #include <cuda_runtime.h>
@@ -49,6 +50,17 @@ __global__ void henon_map_kernel(Grid grid, int steps, double* exponents) {
 		return;
 	}
 	exponents[py * grid.width + px] = plane_exponent(Henon{ grid.a_at(px), grid.b_at(py) }, steps);
+}
+
+bool write_png(const char* filename, Grid grid, const std::vector<double>& exponents) {
+	std::vector<unsigned char> image(exponents.size() * 3);
+	for (std::size_t i = 0; i < exponents.size(); ++i) {
+		const Rgb colour = exponent_colour(exponents[i]);
+		image[3 * i] = colour.r;
+		image[3 * i + 1] = colour.g;
+		image[3 * i + 2] = colour.b;
+	}
+	return stbi_write_png(filename, grid.width, grid.height, 3, image.data(), grid.width * 3) != 0;
 }
 
 int main() {
@@ -148,11 +160,13 @@ int main() {
 	int escape_differs = 0;
 	int map_sign_differs = 0;
 	double map_worst = 0.0;
+	std::vector<double> mismatch(pixels, 0.0);
 	for (int i = 0; i < pixels; ++i) {
 		const double gpu = gpu_map[i];
 		const double cpu = cpu_map[i];
 		if (std::isnan(gpu) != std::isnan(cpu)) {
 			++escape_differs;
+			mismatch[i] = std::numeric_limits<double>::quiet_NaN();
 			continue;
 		}
 		if (std::isnan(gpu)) {
@@ -164,6 +178,7 @@ int main() {
 		}
 		if ((gpu > 0.0) != (cpu > 0.0)) {
 			++map_sign_differs;
+			mismatch[i] = 1.0;
 		}
 		if (std::abs(gpu - cpu) > map_worst) {
 			map_worst = std::abs(gpu - cpu);
@@ -172,5 +187,10 @@ int main() {
 	std::printf("pixels %d identical %d\n", pixels, identical);
 	std::printf("escape differs %d sign differs %d\n", escape_differs, map_sign_differs);
 	std::printf("largest difference %g\n", map_worst);
+	if (!write_png("henon_map_gpu.png", plane, gpu_map) || !write_png("henon_mismatch.png", plane, mismatch)) {
+		std::printf("could not write the PNGs\n");
+		return 1;
+	}
+	std::printf("wrote_henon_map_gpu.png and henon_mismatch.png\n");
 	return 0;
 }
