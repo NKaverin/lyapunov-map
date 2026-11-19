@@ -3,6 +3,7 @@
 #include <cmath>
 #include <vector>
 
+#include "device.hpp"
 #include "stb_image_write.h"
 
 
@@ -21,12 +22,12 @@ struct Grid {
 	int width;
 	int height;
 
-	double a_at(int px) const {
+	HOST_DEVICE double a_at(int px) const {
 		return a_min + (a_max - a_min) * px / (width - 1);
 	}
 
 	// Row 0 is the top of the image
-	double b_at(int py) const {
+	HOST_DEVICE double b_at(int py) const {
 		return b_max - (b_max - b_min) * py / (height - 1);
 	}
 };

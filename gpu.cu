@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -6,6 +7,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 #include "exponent.hpp"
+#include "image.hpp"
 #include "reference.hpp"
 #include "systems.hpp"
 
@@ -38,6 +40,15 @@ __global__ void logistic_kernetl(const double* r_values, double* exponents, int 
 
 __global__ void henon_point_kernel(double a, double b, int steps, double* exponent) {
 	*exponent = plane_exponent(Henon{ a, b }, steps);
+}
+
+__global__ void henon_map_kernel(Grid grid, int steps, double* exponents) {
+	const int px = blockIdx.x * blockDim.x + threadIdx.x;
+	const int py = blockIdx.y * blockDim.y + threadIdx.y;
+	if (px >= grid.width || py >= grid.height) {
+		return;
+	}
+	exponents[py * grid.width + px] = plane_exponent(Henon{ grid.a_at(px), grid.b_at(py) }, steps);
 }
 
 int main() {
@@ -103,6 +114,63 @@ int main() {
 	double point = 0.0;
 	check(cudaMemcpy(&point, device_point, sizeof(double), cudaMemcpyDeviceToHost), "copy pont");
 	check(cudaFree(device_point), "cudaFree point");
-	std::printf("genon 1.4 0.3 gpu %f cpu %f\n", point, plane_exponent(Henon{ 1.4, 0.3 }, 100000));
+	std::printf("henon 1.4 0.3 gpu %f cpu %f\n", point, plane_exponent(Henon{ 1.4, 0.3 }, 100000));
+	// The same plane as henon_map
+	const Grid plane{ 0.0, 2.0, -0.5, 0.5, 768, 384 };
+	const int pixels = plane.width * plane.height;
+	double* device_map = nullptr;
+	check(cudaMalloc(&device_map, pixels * sizeof(double)), "cudaMallc map");
+
+	const dim3 tile(16, 16);
+	const dim3 tiles((plane.width + tile.x - 1) / tile.x, (plane.height + tile.y - 1) / tile.y);
+	const auto gpu_start = std::chrono::steady_clock::now();
+	henon_map_kernel <<<tiles, tile >>> (plane, 1000, device_map);
+	check(cudaGetLastError(), "map launch");
+	check(cudaDeviceSynchronize(), "map run");
+	const std::chrono::duration<double> gpu_time = std::chrono::steady_clock::now() - gpu_start;
+	
+	std::vector<double> gpu_map(pixels);
+	check(cudaMemcpy(gpu_map.data(), device_map, pixels * sizeof(double), cudaMemcpyDeviceToHost), "copy map");
+	check(cudaFree(device_map), "cudaFree map");
+
+	const auto cpu_start = std::chrono::steady_clock::now();
+	std::vector<double> cpu_map(pixels);
+	for (int py = 0; py < plane.height; ++py) {
+		for (int px = 0; px < plane.width; ++px) {
+			cpu_map[py * plane.width + px] = plane_exponent(Henon{ plane.a_at(px), plane.b_at(py) }, 1000);
+		}
+	}
+	const std::chrono::duration<double> cpu_time = std::chrono::steady_clock::now() - cpu_start;
+	std::printf("map gpu %f s cpu %f s\n", gpu_time.count(), cpu_time.count());
+
+	// Px by px
+	int identical = 0;
+	int escape_differs = 0;
+	int map_sign_differs = 0;
+	double map_worst = 0.0;
+	for (int i = 0; i < pixels; ++i) {
+		const double gpu = gpu_map[i];
+		const double cpu = cpu_map[i];
+		if (std::isnan(gpu) != std::isnan(cpu)) {
+			++escape_differs;
+			continue;
+		}
+		if (std::isnan(gpu)) {
+			++identical;
+			continue;
+		}
+		if (gpu == cpu) {
+			++identical;
+		}
+		if ((gpu > 0.0) != (cpu > 0.0)) {
+			++map_sign_differs;
+		}
+		if (std::abs(gpu - cpu) > map_worst) {
+			map_worst = std::abs(gpu - cpu);
+		}
+	}
+	std::printf("pixels %d identical %d\n", pixels, identical);
+	std::printf("escape differs %d sign differs %d\n", escape_differs, map_sign_differs);
+	std::printf("largest difference %g\n", map_worst);
 	return 0;
 }
