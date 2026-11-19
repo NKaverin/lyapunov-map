@@ -121,7 +121,7 @@ int main() {
 	// Henon
 	double* device_point = nullptr;
 	check(cudaMalloc(&device_point, sizeof(double)), "cudaMalloc point");
-	henon_point_kernel<<<1, 1 >>> (1.3, 0.3, 100000, device_point);
+	henon_point_kernel<<<1, 1 >>> (1.4, 0.3, 100000, device_point);
 	check(cudaGetLastError(), "point launch");
 	double point = 0.0;
 	check(cudaMemcpy(&point, device_point, sizeof(double), cudaMemcpyDeviceToHost), "copy pont");
