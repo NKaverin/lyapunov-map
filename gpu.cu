@@ -4,7 +4,10 @@
 #include <vector>
 
 #include <cuda_runtime.h>
+#include <device_launch_parameters.h>
+#include "exponent.hpp"
 #include "reference.hpp"
+#include "systems.hpp"
 
 void check(cudaError_t result, const char* what) {
 	if (result != cudaSuccess) {
@@ -31,6 +34,10 @@ __global__ void logistic_kernetl(const double* r_values, double* exponents, int 
 		x = r * x * (1.0 - x);
 	}
 	exponents[i] = sum / steps;
+}
+
+__global__ void henon_point_kernel(double a, double b, int steps, double* exponent) {
+	*exponent = plane_exponent(Henon{ a, b }, steps);
 }
 
 int main() {
@@ -87,5 +94,15 @@ int main() {
 	std::printf("gpu r==4 %f\n", exponents[samples - 1]);
 	std::printf("largest difference %g at r=%f\n", worst, worst_r);
 	std::printf("sign differs at %d of %d\n", sign_differs, samples);
+
+	// Henon
+	double* device_point = nullptr;
+	check(cudaMalloc(&device_point, sizeof(double)), "cudaMalloc point");
+	henon_point_kernel<<<1, 1 >>> (1.3, 0.3, 100000, device_point);
+	check(cudaGetLastError(), "point launch");
+	double point = 0.0;
+	check(cudaMemcpy(&point, device_point, sizeof(double), cudaMemcpyDeviceToHost), "copy pont");
+	check(cudaFree(device_point), "cudaFree point");
+	std::printf("genon 1.4 0.3 gpu %f cpu %f\n", point, plane_exponent(Henon{ 1.4, 0.3 }, 100000));
 	return 0;
 }

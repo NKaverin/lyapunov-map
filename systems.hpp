@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "device.hpp"
+
 // Each system has step(state, n), T is double or Dual
  
 struct Logistic {
@@ -46,7 +48,7 @@ struct Henon {
 	double b;
 
 	template <typename T>
-	Vec2<T> step(Vec2<T> p, int) const {
+	HOST_DEVICE Vec2<T> step(Vec2<T> p, int) const {
 		return Vec2<T>{ 1.0 - a * p.x * p.x + p.y, b* p.x };
 	}
 };

@@ -50,4 +50,5 @@ if(CMAKE_CUDA_COMPILER)
 	# RTX 3050
 	set_target_properties(lyapgpu PROPERTIES CUDA_ARCHITECTURES 86)
 	target_include_directories(lyapgpu PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+	target_compile_options(lyapgpu PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Werror=all-warnings>)
 endif()
